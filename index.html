@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>من أنا؟ - رنيم فاي</title>
+<style>
+  :root {
+    --teal: #0d9488;
+    --teal-light: #ccfbf1;
+    --teal-dark: #0f766e;
+    --pink: #f43f5e;
+    --bg: #f0fdfa;
+    --card: #ffffff;
+    --text: #134e4a;
+    --shadow: 0 4px 20px rgba(13,148,136,0.15);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI',Tahoma,sans-serif; background:var(--bg); min-height:100vh; direction:rtl; }
+
+  header {
+    background: linear-gradient(135deg,var(--teal),var(--teal-dark));
+    padding:14px 20px; text-align:center; position:relative;
+  }
+  header h1 { color:white; font-size:1.5rem; font-weight:800; }
+  header p { color:var(--teal-light); font-size:0.8rem; margin-top:2px; }
+  .brand {
+    position:absolute; left:12px; top:50%; transform:translateY(-50%);
+    background:rgba(255,255,255,0.2); border-radius:8px;
+    padding:4px 8px; color:white; font-size:0.72rem; font-weight:700;
+  }
+
+  /* CATEGORIES */
+  #screen-categories { padding:20px 14px; }
+  .screen-title { text-align:center; color:var(--text); font-size:1.1rem; font-weight:700; margin-bottom:16px; }
+  .categories-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; max-width:420px; margin:0 auto; }
+  .cat-card {
+    background:var(--card); border-radius:16px; padding:18px 12px;
+    text-align:center; cursor:pointer; border:3px solid #e2e8f0;
+    box-shadow:var(--shadow); transition:transform 0.15s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .cat-card:active { transform:scale(0.94); }
+  .cat-card .cat-emoji { font-size:3rem; display:block; margin-bottom:6px; }
+  .cat-card .cat-name { font-size:0.95rem; font-weight:700; color:var(--text); }
+  .cat-card[data-cat="animals"] { border-color:#10b981; }
+  .cat-card[data-cat="jobs"]    { border-color:#8b5cf6; }
+  .cat-card[data-cat="fruits"]  { border-color:var(--pink); }
+  .cat-card[data-cat="school"]  { border-color:#f59e0b; }
+  .all-btn {
+    display:block; max-width:420px; margin:12px auto 0;
+    background:linear-gradient(135deg,var(--teal),var(--teal-dark));
+    color:white; border:none; border-radius:14px; padding:14px;
+    font-size:1rem; font-weight:700; cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  /* GAME */
+  #screen-game { display:none; padding:14px; }
+  .game-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:6px; }
+  .score-box {
+    background:var(--card); border-radius:10px; padding:6px 10px;
+    font-size:0.85rem; font-weight:700; color:var(--teal); box-shadow:var(--shadow);
+    white-space:nowrap;
+  }
+  .back-btn {
+    background:none; border:2px solid var(--teal); border-radius:10px;
+    padding:6px 10px; color:var(--teal); font-size:0.82rem; font-weight:700; cursor:pointer;
+  }
+
+  .mystery-box {
+    background:linear-gradient(135deg,#1e293b,#334155);
+    border-radius:18px; padding:16px; text-align:center;
+    margin-bottom:14px; box-shadow:0 8px 30px rgba(0,0,0,0.2);
+  }
+  .mystery-label { color:#94a3b8; font-size:0.78rem; margin-bottom:8px; }
+  .clues-container { display:flex; flex-direction:column; gap:7px; margin-bottom:10px; }
+  .clue-bubble {
+    background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);
+    border-radius:10px; padding:9px 12px; color:white; font-size:0.92rem;
+    animation:slideIn 0.35s ease; text-align:right;
+  }
+  .clue-number {
+    display:inline-block; background:var(--teal); color:white;
+    border-radius:50%; width:20px; height:20px; line-height:20px;
+    text-align:center; font-size:0.72rem; margin-left:7px; font-weight:700;
+  }
+  @keyframes slideIn {
+    from { opacity:0; transform:translateY(-8px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .next-clue-btn {
+    background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3);
+    border-radius:10px; padding:8px 16px; color:white; font-size:0.83rem;
+    cursor:pointer; -webkit-tap-highlight-color:transparent;
+  }
+  .next-clue-btn:disabled { opacity:0.4; }
+
+  .choices-label { text-align:center; color:var(--text); font-size:0.88rem; font-weight:600; margin-bottom:8px; }
+  .choices-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; max-width:420px; margin:0 auto; }
+
+  .choice-card {
+    background:var(--card); border-radius:16px; padding:14px 8px;
+    text-align:center; cursor:pointer; border:3px solid #e2e8f0;
+    box-shadow:var(--shadow); transition:transform 0.12s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .choice-card:active { transform:scale(0.93); }
+  .choice-emoji { font-size:4rem; display:block; line-height:1.1; }
+  .choice-name  { display:block; margin-top:6px; font-size:0.92rem; font-weight:700; color:var(--text); }
+  .choice-card.correct { border-color:#10b981; background:#f0fdf4; }
+  .choice-card.wrong   { border-color:var(--pink); background:#fff1f2; }
+
+  .result-msg {
+    text-align:center; padding:10px; border-radius:12px;
+    font-size:1rem; font-weight:700; margin-top:10px;
+    display:none; max-width:420px; margin-left:auto; margin-right:auto;
+  }
+  .result-msg.show    { display:block; }
+  .result-msg.correct { background:#d1fae5; color:#065f46; }
+  .result-msg.wrong   { background:#ffe4e6; color:#9f1239; }
+
+  .next-q-btn {
+    display:none; margin:10px auto 0;
+    background:linear-gradient(135deg,var(--teal),var(--teal-dark));
+    color:white; border:none; border-radius:12px;
+    padding:12px 26px; font-size:0.95rem; font-weight:700;
+    cursor:pointer; -webkit-tap-highlight-color:transparent;
+  }
+  .next-q-btn.show { display:block; }
+
+  /* END */
+  #screen-end { display:none; padding:28px 18px; text-align:center; }
+  .trophy { font-size:4rem; margin-bottom:10px; }
+  .end-title { font-size:1.4rem; font-weight:800; color:var(--text); margin-bottom:6px; }
+  .end-score { font-size:1rem; color:var(--teal); font-weight:700; margin-bottom:18px; }
+  .stars { font-size:2rem; margin-bottom:14px; letter-spacing:4px; }
+  .replay-btn {
+    background:linear-gradient(135deg,var(--teal),var(--teal-dark));
+    color:white; border:none; border-radius:12px;
+    padding:13px 28px; font-size:0.95rem; font-weight:700; cursor:pointer; margin:5px;
+  }
+  .home-btn {
+    background:var(--card); color:var(--teal);
+    border:2px solid var(--teal); border-radius:12px;
+    padding:11px 24px; font-size:0.95rem; font-weight:700; cursor:pointer; margin:5px;
+  }
+
+  /* Confetti */
+  .confetti-piece {
+    position:fixed; border-radius:2px;
+    animation:confettiFall 1.5s ease-in forwards;
+    pointer-events:none; z-index:999;
+  }
+  @keyframes confettiFall {
+    0%   { transform:translateY(-20px) rotate(0deg); opacity:1; }
+    100% { transform:translateY(100vh) rotate(720deg); opacity:0; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">رنيم فاي</div>
+  <h1>🔍 من أنا؟</h1>
+  <p>خمّن من التلميحات</p>
+</header>
+
+<!-- CATEGORIES -->
+<div id="screen-categories">
+  <p class="screen-title">اختر فئة للعب</p>
+  <div class="categories-grid">
+    <div class="cat-card" data-cat="animals" onclick="startGame('animals')">
+      <span class="cat-emoji">🦁</span><span class="cat-name">الحيوانات</span>
+    </div>
+    <div class="cat-card" data-cat="jobs" onclick="startGame('jobs')">
+      <span class="cat-emoji">👨‍⚕️</span><span class="cat-name">المهن</span>
+    </div>
+    <div class="cat-card" data-cat="fruits" onclick="startGame('fruits')">
+      <span class="cat-emoji">🍎</span><span class="cat-name">فواكه وخضروات</span>
+    </div>
+    <div class="cat-card" data-cat="school" onclick="startGame('school')">
+      <span class="cat-emoji">📚</span><span class="cat-name">البيئة المدرسية</span>
+    </div>
+  </div>
+  <button class="all-btn" onclick="startGame('all')">🎲 العب بكل الفئات</button>
+</div>
+
+<!-- GAME -->
+<div id="screen-game">
+  <div class="game-header">
+    <button class="back-btn" onclick="goHome()">← رجوع</button>
+    <div class="score-box">⭐ <span id="score-display">0</span></div>
+    <div class="score-box">س <span id="q-num">1</span>/<span id="q-total">10</span></div>
+  </div>
+  <div class="mystery-box">
+    <div class="mystery-label">🔎 من أنا؟ اقرأ التلميحات</div>
+    <div class="clues-container" id="clues-container"></div>
+    <button class="next-clue-btn" id="next-clue-btn" onclick="showNextClue()">تلميح آخر 💡</button>
+  </div>
+  <p class="choices-label">اختر الإجابة الصحيحة:</p>
+  <div class="choices-grid" id="choices-grid"></div>
+  <div class="result-msg" id="result-msg"></div>
+  <button class="next-q-btn" id="next-q-btn" onclick="nextQuestion()">التالي ←</button>
+</div>
+
+<!-- END -->
+<div id="screen-end">
+  <div class="trophy" id="end-trophy">🏆</div>
+  <div class="stars" id="end-stars">⭐⭐⭐</div>
+  <div class="end-title" id="end-title">أحسنت!</div>
+  <div class="end-score" id="end-score"></div>
+  <button class="replay-btn" onclick="replayGame()">العب مجدداً 🔄</button>
+  <button class="home-btn"   onclick="goHome()">🏠 الرئيسية</button>
+</div>
+
+<script>
+// ============================================================
+// DATA  — emoji بدل SVG
+// ============================================================
+const DATA = {
+  animals: [
+    { name:"الأسد",    clues:["أنا ملك الغابة","لدي لبدة كثيفة حول رأسي","أزأر بصوت قوي جداً","أعيش في السافانا الأفريقية"],
+      choices:["الأسد","النمر","الفيل","الزرافة"], answer:"الأسد",
+      emojis:{"الأسد":"🦁","النمر":"🐯","الفيل":"🐘","الزرافة":"🦒"} },
+
+    { name:"الفيل",   clues:["أنا أكبر حيوان بري","لدي خرطوم طويل جداً","أذناي كبيرتان كالمراوح","أحب الاستحمام في النهر"],
+      choices:["الحصان","الفيل","الكركدن","أفراس النهر"], answer:"الفيل",
+      emojis:{"الحصان":"🐴","الفيل":"🐘","الكركدن":"🦏","أفراس النهر":"🦛"} },
+
+    { name:"الببغاء",  clues:["أنا طائر ملوّن جميل","أستطيع تقليد الكلام","لدي منقار معقوف","أعيش في الغابات الاستوائية"],
+      choices:["النسر","البومة","الببغاء","البطريق"], answer:"الببغاء",
+      emojis:{"النسر":"🦅","البومة":"🦉","الببغاء":"🦜","البطريق":"🐧"} },
+
+    { name:"السمكة",  clues:["أعيش في الماء","أتنفس بالخياشيم","لدي زعانف للسباحة","أضع بيوضي في الماء"],
+      choices:["السلحفاة","السمكة","الضفدع","الحوت"], answer:"السمكة",
+      emojis:{"السلحفاة":"🐢","السمكة":"🐟","الضفدع":"🐸","الحوت":"🐳"} },
+
+    { name:"الأرنب",  clues:["أذناي طويلتان جداً","أقفز بدلاً من المشي","فراؤي ناعم ودافئ","أحب أكل الجزر"],
+      choices:["الأرنب","القنفذ","السنجاب","الفأر"], answer:"الأرنب",
+      emojis:{"الأرنب":"🐰","القنفذ":"🦔","السنجاب":"🐿️","الفأر":"🐭"} },
+
+    { name:"القرد",   clues:["أتسلق الأشجار بسرعة","ذيلي طويل","أحب الموز كثيراً","أشبه الإنسان في شكله"],
+      choices:["القرد","الدب","الكنغر","الذئب"], answer:"القرد",
+      emojis:{"القرد":"🐒","الدب":"🐻","الكنغر":"🦘","الذئب":"🐺"} },
+  ],
+
+  jobs: [
+    { name:"الطبيب",       clues:["أرتدي معطفاً أبيض","أعالج المرضى","أستعمل السماعة الطبية","أعمل في المستشفى"],
+      choices:["الطبيب","المهندس","المعلم","الطباخ"], answer:"الطبيب",
+      emojis:{"الطبيب":"👨‍⚕️","المهندس":"👷","المعلم":"👨‍🏫","الطباخ":"👨‍🍳"} },
+
+    { name:"المعلم",       clues:["أعمل في المدرسة","أشرح الدروس وأساعد التلاميذ","أستعمل السبورة","أصحح الواجبات"],
+      choices:["الشرطي","المعلم","الممرضة","المزارع"], answer:"المعلم",
+      emojis:{"الشرطي":"👮","المعلم":"👨‍🏫","الممرضة":"👩‍⚕️","المزارع":"👨‍🌾"} },
+
+    { name:"رجل الإطفاء", clues:["أرتدي خوذة وبدلة خاصة","أطفئ الحرائق","أستعمل خرطوم الماء","أسمع صفارة سيارتي"],
+      choices:["رجل الإطفاء","البحار","الطيار","الشرطي"], answer:"رجل الإطفاء",
+      emojis:{"رجل الإطفاء":"👨‍🚒","البحار":"⚓","الطيار":"👨‍✈️","الشرطي":"👮"} },
+
+    { name:"الطباخ",       clues:["أرتدي قبعة بيضاء طويلة","أطبخ الأطعمة اللذيذة","أعمل في المطعم","أستعمل الأواني"],
+      choices:["الخباز","الطباخ","الميكانيكي","البستاني"], answer:"الطباخ",
+      emojis:{"الخباز":"🥐","الطباخ":"👨‍🍳","الميكانيكي":"🔧","البستاني":"👨‍🌾"} },
+
+    { name:"المزارع",      clues:["أعمل في الحقل","أزرع الخضروات والفواكه","أستيقظ مبكراً جداً","الطبيعة هي مكان عملي"],
+      choices:["المزارع","الطيار","الطبيب","المعلم"], answer:"المزارع",
+      emojis:{"المزارع":"👨‍🌾","الطيار":"👨‍✈️","الطبيب":"👨‍⚕️","المعلم":"👨‍🏫"} },
+  ],
+
+  fruits: [
+    { name:"التفاحة",   clues:["لوني أحمر أو أخضر","شكلي مستدير","أنمو على الشجر","قشرتي ناعمة ولحمي مقرمش"],
+      choices:["التفاحة","البرتقال","العنب","الخوخ"], answer:"التفاحة",
+      emojis:{"التفاحة":"🍎","البرتقال":"🍊","العنب":"🍇","الخوخ":"🍑"} },
+
+    { name:"الموزة",    clues:["شكلي منحنٍ كالهلال","قشرتي صفراء عند النضج","أنمو في عناقيد","القرود تحبني كثيراً"],
+      choices:["المانغو","الأناناس","الموزة","الكمثرى"], answer:"الموزة",
+      emojis:{"المانغو":"🥭","الأناناس":"🍍","الموزة":"🍌","الكمثرى":"🍐"} },
+
+    { name:"الجزرة",    clues:["لوني برتقالي","أنمو تحت الأرض","أوراقي الخضراء فوق التربة","الأرانب تحبني جداً"],
+      choices:["البطاطا","الفجل","الجزرة","الشمندر"], answer:"الجزرة",
+      emojis:{"البطاطا":"🥔","الفجل":"🌱","الجزرة":"🥕","الشمندر":"🟣"} },
+
+    { name:"البطيخ",    clues:["حجمي كبير وثقيل","قشرتي خضراء ولحمي أحمر","أحتوي على بذور سوداء","أنا فاكهة الصيف"],
+      choices:["الشمام","البطيخ","القرع","الليمون"], answer:"البطيخ",
+      emojis:{"الشمام":"🍈","البطيخ":"🍉","القرع":"🎃","الليمون":"🍋"} },
+
+    { name:"الفراولة",  clues:["لوني أحمر ومنقّط بنقاط صفراء","شكلي كالقلب","أنمو قريباً من الأرض","طعمي حلو ومنعش"],
+      choices:["التوت","الفراولة","الكرز","العنب"], answer:"الفراولة",
+      emojis:{"التوت":"🫐","الفراولة":"🍓","الكرز":"🍒","العنب":"🍇"} },
+  ],
+
+  school: [
+    { name:"المسطرة",      clues:["أنا مستطيلة وطويلة","أُستعمل لرسم الخطوط المستقيمة","عليّ أرقام للقياس","أُصنع من البلاستيك أو الخشب"],
+      choices:["المسطرة","المقص","الممحاة","المنقلة"], answer:"المسطرة",
+      emojis:{"المسطرة":"📏","المقص":"✂️","الممحاة":"🧹","المنقلة":"📐"} },
+
+    { name:"القلم الرصاص", clues:["أكتب وأُمحى بسهولة","قلبي من الغرافيت الرمادي","أحتاج براية لأبقى حاداً","أنا أول صديق للتلميذ"],
+      choices:["القلم الحبر","القلم الرصاص","الطباشير","الماركر"], answer:"القلم الرصاص",
+      emojis:{"القلم الحبر":"🖊️","القلم الرصاص":"✏️","الطباشير":"🖍️","الماركر":"🖍️"} },
+
+    { name:"المحفظة",      clues:["أحمل الكتب والأدوات","التلاميذ يضعونني على ظهورهم","لدي جيوب وسحّابات","أُعدّ في الصباح قبل المدرسة"],
+      choices:["الحقيبة الرياضية","المحفظة","الحافظة","العلبة"], answer:"المحفظة",
+      emojis:{"الحقيبة الرياضية":"👜","المحفظة":"🎒","الحافظة":"📁","العلبة":"📦"} },
+
+    { name:"السبورة",      clues:["أنا على جدار الفصل","المعلم يكتب عليّ بالطباشير","أُمحى بالممسحة","الدرس يبدأ عليّ"],
+      choices:["الشاشة","السبورة","اللوحة","الكتاب"], answer:"السبورة",
+      emojis:{"الشاشة":"📺","السبورة":"🖥️","اللوحة":"🎨","الكتاب":"📖"} },
+
+    { name:"الكتاب",       clues:["أحمل المعرفة والعلم","لدي صفحات كثيرة","تقرأني بعيونك","المكتبة مليئة بي"],
+      choices:["الكراس","الكتاب","المجلة","القاموس"], answer:"الكتاب",
+      emojis:{"الكراس":"📓","الكتاب":"📖","المجلة":"📰","القاموس":"📚"} },
+  ],
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let state = { category:null, questions:[], currentIndex:0, currentClue:0, score:0, answered:false };
+
+// TTS
+let voices = [];
+window.speechSynthesis.onvoiceschanged = () => { voices = window.speechSynthesis.getVoices(); };
+voices = window.speechSynthesis.getVoices();
+
+function speak(text) {
+  window.speechSynthesis.cancel();
+  setTimeout(() => {
+    const u = new SpeechSynthesisUtterance(text);
+    const ar = voices.find(v=>v.lang==='ar-SA') || voices.find(v=>v.lang.startsWith('ar'));
+    if(ar) u.voice = ar;
+    u.lang='ar-SA'; u.rate=0.85;
+    window.speechSynthesis.speak(u);
+  }, 80);
+}
+
+function playSound(type) {
+  try {
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const osc=ctx.createOscillator(), g=ctx.createGain();
+    osc.connect(g); g.connect(ctx.destination);
+    if(type==='correct'){
+      osc.frequency.setValueAtTime(523,ctx.currentTime);
+      osc.frequency.setValueAtTime(659,ctx.currentTime+0.1);
+      osc.frequency.setValueAtTime(784,ctx.currentTime+0.2);
+      g.gain.setValueAtTime(0.3,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.5);
+      osc.start(); osc.stop(ctx.currentTime+0.5);
+    } else {
+      osc.frequency.setValueAtTime(280,ctx.currentTime);
+      osc.frequency.setValueAtTime(180,ctx.currentTime+0.2);
+      g.gain.setValueAtTime(0.3,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.4);
+      osc.start(); osc.stop(ctx.currentTime+0.4);
+    }
+  } catch(e){}
+}
+
+// ============================================================
+// GAME LOGIC
+// ============================================================
+function startGame(cat) {
+  state.category = cat;
+  let pool = cat==='all' ? Object.values(DATA).flat() : [...DATA[cat]];
+  pool = pool.sort(()=>Math.random()-0.5);
+  state.questions = pool.slice(0, Math.min(10, pool.length));
+  state.currentIndex = 0;
+  state.score = 0;
+
+  document.getElementById('screen-categories').style.display = 'none';
+  document.getElementById('screen-game').style.display = 'block';
+  document.getElementById('screen-end').style.display = 'none';
+  document.getElementById('q-total').textContent = state.questions.length;
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = state.questions[state.currentIndex];
+  state.currentClue = 0;
+  state.answered = false;
+
+  document.getElementById('score-display').textContent = state.score;
+  document.getElementById('q-num').textContent = state.currentIndex + 1;
+  document.getElementById('clues-container').innerHTML = '';
+  document.getElementById('result-msg').className = 'result-msg';
+  document.getElementById('next-q-btn').className = 'next-q-btn';
+
+  showClue();
+
+  // Choices
+  const grid = document.getElementById('choices-grid');
+  grid.innerHTML = '';
+  [...q.choices].sort(()=>Math.random()-0.5).forEach(name => {
+    const card = document.createElement('div');
+    card.className = 'choice-card';
+    card.innerHTML = `<span class="choice-emoji">${q.emojis[name]}</span><span class="choice-name">${name}</span>`;
+    card.ontouchend = (e) => { e.preventDefault(); checkAnswer(name, card, q); };
+    card.onclick    = ()  => checkAnswer(name, card, q);
+    grid.appendChild(card);
+  });
+
+  updateClueBtn(q);
+}
+
+function showClue() {
+  const q = state.questions[state.currentIndex];
+  const clue = q.clues[state.currentClue];
+  const div = document.createElement('div');
+  div.className = 'clue-bubble';
+  div.innerHTML = `<span class="clue-number">${state.currentClue+1}</span>${clue}`;
+  document.getElementById('clues-container').appendChild(div);
+  speak(clue);
+}
+
+function showNextClue() {
+  const q = state.questions[state.currentIndex];
+  if (state.currentClue < q.clues.length-1) {
+    state.currentClue++;
+    showClue();
+    updateClueBtn(q);
+  }
+}
+
+function updateClueBtn(q) {
+  const btn = document.getElementById('next-clue-btn');
+  const rem = q.clues.length - 1 - state.currentClue;
+  btn.disabled = rem<=0 || state.answered;
+  btn.textContent = rem>0 ? `تلميح آخر 💡 (${rem} متبقٍ)` : 'كل التلميحات ظهرت';
+}
+
+function checkAnswer(chosen, card, q) {
+  if (state.answered) return;
+  state.answered = true;
+  document.getElementById('next-clue-btn').disabled = true;
+
+  const correct = chosen === q.answer;
+  document.querySelectorAll('.choice-card').forEach(c => {
+    const nm = c.querySelector('.choice-name').textContent;
+    if (nm===q.answer) c.classList.add('correct');
+    else if (nm===chosen && !correct) c.classList.add('wrong');
+  });
+
+  const resultEl = document.getElementById('result-msg');
+  const nextBtn  = document.getElementById('next-q-btn');
+  const isLast   = state.currentIndex >= state.questions.length-1;
+
+  if (correct) {
+    const pts = Math.max(4-state.currentClue, 1);
+    state.score += pts;
+    document.getElementById('score-display').textContent = state.score;
+    resultEl.className = 'result-msg correct show';
+    resultEl.textContent = `🎉 أحسنت! +${pts} نقاط`;
+    playSound('correct');
+    confetti();
+    speak('أحسنت إجابة صحيحة');
+  } else {
+    resultEl.className = 'result-msg wrong show';
+    resultEl.textContent = `❌ الإجابة: ${q.emojis[q.answer]} ${q.answer}`;
+    playSound('wrong');
+    speak(`الإجابة الصحيحة هي ${q.answer}`);
+  }
+
+  nextBtn.className = 'next-q-btn show';
+  nextBtn.textContent = isLast ? 'عرض النتيجة 🏆' : 'التالي ←';
+}
+
+function nextQuestion() {
+  state.currentIndex++;
+  state.currentIndex >= state.questions.length ? showEnd() : renderQuestion();
+}
+
+function showEnd() {
+  document.getElementById('screen-game').style.display = 'none';
+  document.getElementById('screen-end').style.display = 'block';
+  const total = state.questions.length;
+  const pct = state.score / (total*4);
+  let trophy='🏆', stars='⭐⭐⭐', title='ممتاز! أنت بطل الألغاز!';
+  if(pct<0.4){ trophy='😊'; stars='⭐'; title='تدرّب أكثر ستتحسن!'; }
+  else if(pct<0.7){ trophy='🥈'; stars='⭐⭐'; title='جيد جداً! استمر!'; }
+  document.getElementById('end-trophy').textContent = trophy;
+  document.getElementById('end-stars').textContent  = stars;
+  document.getElementById('end-title').textContent  = title;
+  document.getElementById('end-score').textContent  = `نقاطك: ${state.score} من ${total*4}`;
+  confetti(); speak(title);
+}
+
+function replayGame() { startGame(state.category); }
+function goHome() {
+  document.getElementById('screen-categories').style.display = 'block';
+  document.getElementById('screen-game').style.display = 'none';
+  document.getElementById('screen-end').style.display = 'none';
+}
+
+function confetti() {
+  const colors=['#0d9488','#f43f5e','#fbbf24','#8b5cf6','#10b981','#3b82f6'];
+  for(let i=0;i<28;i++) {
+    setTimeout(()=>{
+      const el=document.createElement('div');
+      el.className='confetti-piece';
+      el.style.cssText=`left:${Math.random()*100}vw;top:-10px;background:${colors[Math.floor(Math.random()*colors.length)]};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${1+Math.random()}s;`;
+      document.body.appendChild(el);
+      setTimeout(()=>el.remove(),2000);
+    },i*35);
+  }
+}
+</script>
+</body>
+</html>
