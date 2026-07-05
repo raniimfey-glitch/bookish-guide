@@ -1,71 +1,146 @@
+<!--
+================================================================================
+  Project Name : التعليم الممتع | Fun Learning
+  Version      : ألعاب تعليمية : من أنا - v2.0
+  Developer    : Samira Abdessadok "رنيم فاي" | سميرة عبد الصّدوق
+  Date         : جوان 2026
+================================================================================
+  Copyright (c) 2026 Samira Abdessadok "رنيم فاي". All Rights Reserved.
+  جميع الحقوق محفوظة © 2026 سميرة عبد الصّدوق "رنيم فاي".
+
+  NOTICE: This software is the exclusive intellectual property of
+  Samira Abdessadok "رنيم فاي". Unauthorized reproduction, distribution,
+  modification, or use of this code, in whole or in part, is strictly
+  prohibited without prior written consent from the owner.
+
+  تنبيه: هذا البرنامج هو ملكية فكرية حصرية لسميرة عبد الصّدوق "رنيم فاي".
+  يمنع منعاً باتاً نسخ أو توزيع أو تعديل أو استخدام هذا الكود،
+  كلياً أو جزئياً، دون الحصول على إذن خطي مسبق من صاحبة الحقوق.
+================================================================================
+-->
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>من أنا؟ - رنيم فاي</title>
+<title>من أنا؟ - التعليم الممتع</title>
 <style>
   :root {
-    --teal: #0d9488;
-    --teal-light: #ccfbf1;
-    --teal-dark: #0f766e;
-    --pink: #f43f5e;
-    --bg: #f0fdfa;
-    --card: #ffffff;
-    --text: #134e4a;
+    --teal: #0d9488; --teal-light: #ccfbf1; --teal-dark: #0f766e;
+    --pink: #f43f5e; --yellow: #fbbf24; --purple: #8b5cf6;
+    --bg: #f0fdfa; --card: #ffffff; --text: #134e4a;
     --shadow: 0 4px 20px rgba(13,148,136,0.15);
   }
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Segoe UI',Tahoma,sans-serif; background:var(--bg); min-height:100vh; direction:rtl; }
+  body { font-family:'Segoe UI',Tahoma,sans-serif; background:var(--bg); min-height:100vh; direction:rtl; overflow-x:hidden; }
 
+  /* ====== SPLASH SCREEN ====== */
+  #splash {
+    position:fixed; inset:0; z-index:9999;
+    background:linear-gradient(160deg,#0f766e 0%,#0d9488 50%,#14b8a6 100%);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  #splash.hide { opacity:0; transform:scale(1.05); pointer-events:none; }
+  .splash-logo { font-size:5rem; animation:logoBounce 1s ease infinite alternate; }
+  @keyframes logoBounce {
+    from { transform:translateY(0) scale(1); }
+    to   { transform:translateY(-12px) scale(1.08); }
+  }
+  .splash-title {
+    color:white; font-size:1.6rem; font-weight:900;
+    margin-top:16px; text-align:center; letter-spacing:1px;
+  }
+  .splash-sub { color:var(--teal-light); font-size:0.9rem; margin-top:6px; }
+  .splash-brand {
+    margin-top:24px; background:rgba(255,255,255,0.15);
+    border-radius:20px; padding:6px 20px;
+    color:white; font-size:0.8rem; font-weight:700; letter-spacing:0.5px;
+  }
+  .splash-dots { display:flex; gap:8px; margin-top:30px; }
+  .splash-dot {
+    width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,0.4);
+    animation:dotPulse 1.2s ease infinite;
+  }
+  .splash-dot:nth-child(2){ animation-delay:0.2s; }
+  .splash-dot:nth-child(3){ animation-delay:0.4s; }
+  @keyframes dotPulse {
+    0%,100%{ background:rgba(255,255,255,0.3); transform:scale(1); }
+    50%    { background:white; transform:scale(1.3); }
+  }
+
+  /* ====== SCREEN TRANSITIONS ====== */
+  .screen {
+    opacity:0; transform:translateY(18px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    pointer-events:none; display:none;
+  }
+  .screen.visible { display:block; }
+  .screen.active  { opacity:1; transform:translateY(0); pointer-events:all; }
+
+  /* ====== HEADER ====== */
   header {
-    background: linear-gradient(135deg,var(--teal),var(--teal-dark));
-    padding:14px 20px; text-align:center; position:relative;
+    background:linear-gradient(135deg,var(--teal),var(--teal-dark));
+    padding:14px 20px; text-align:center;
   }
-  header h1 { color:white; font-size:1.5rem; font-weight:800; }
-  header p { color:var(--teal-light); font-size:0.8rem; margin-top:2px; }
   .brand {
-    position:absolute; left:12px; top:50%; transform:translateY(-50%);
-    background:rgba(255,255,255,0.2); border-radius:8px;
-    padding:4px 8px; color:white; font-size:0.72rem; font-weight:700;
+    display:inline-block; background:rgba(255,255,255,0.2);
+    border-radius:20px; padding:4px 16px;
+    color:white; font-size:0.78rem; font-weight:700;
+    margin-bottom:5px; letter-spacing:0.5px;
   }
+  header h1 { color:white; font-size:1.45rem; font-weight:900; }
+  header p  { color:var(--teal-light); font-size:0.78rem; margin-top:2px; }
 
-  /* CATEGORIES */
+  /* ====== CATEGORIES ====== */
   #screen-categories { padding:20px 14px; }
   .screen-title { text-align:center; color:var(--text); font-size:1.1rem; font-weight:700; margin-bottom:16px; }
   .categories-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; max-width:420px; margin:0 auto; }
   .cat-card {
-    background:var(--card); border-radius:16px; padding:18px 12px;
+    background:var(--card); border-radius:18px; padding:20px 12px;
     text-align:center; cursor:pointer; border:3px solid #e2e8f0;
-    box-shadow:var(--shadow); transition:transform 0.15s;
+    box-shadow:var(--shadow); transition:transform 0.15s, box-shadow 0.15s;
     -webkit-tap-highlight-color:transparent;
   }
-  .cat-card:active { transform:scale(0.94); }
-  .cat-card .cat-emoji { font-size:3rem; display:block; margin-bottom:6px; }
-  .cat-card .cat-name { font-size:0.95rem; font-weight:700; color:var(--text); }
-  .cat-card[data-cat="animals"] { border-color:#10b981; }
-  .cat-card[data-cat="jobs"]    { border-color:#8b5cf6; }
-  .cat-card[data-cat="fruits"]  { border-color:var(--pink); }
-  .cat-card[data-cat="school"]  { border-color:#f59e0b; }
+  .cat-card:active { transform:scale(0.93); box-shadow:none; }
+  .cat-card .cat-emoji { font-size:3.2rem; display:block; margin-bottom:7px; }
+  .cat-card .cat-name  { font-size:0.93rem; font-weight:700; color:var(--text); }
+  .cat-card[data-cat="animals"]{ border-color:#10b981; }
+  .cat-card[data-cat="jobs"]   { border-color:var(--purple); }
+  .cat-card[data-cat="fruits"] { border-color:var(--pink); }
+  .cat-card[data-cat="school"] { border-color:var(--yellow); }
   .all-btn {
     display:block; max-width:420px; margin:12px auto 0;
     background:linear-gradient(135deg,var(--teal),var(--teal-dark));
     color:white; border:none; border-radius:14px; padding:14px;
     font-size:1rem; font-weight:700; cursor:pointer;
     -webkit-tap-highlight-color:transparent;
+    transition:transform 0.12s;
   }
+  .all-btn:active { transform:scale(0.97); }
 
-  /* GAME */
-  #screen-game { display:none; padding:14px; }
+  /* ====== GAME ====== */
+  #screen-game { padding:14px; }
   .game-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:6px; }
   .score-box {
     background:var(--card); border-radius:10px; padding:6px 10px;
-    font-size:0.85rem; font-weight:700; color:var(--teal); box-shadow:var(--shadow);
-    white-space:nowrap;
+    font-size:0.85rem; font-weight:700; color:var(--teal);
+    box-shadow:var(--shadow); white-space:nowrap;
   }
   .back-btn {
     background:none; border:2px solid var(--teal); border-radius:10px;
     padding:6px 10px; color:var(--teal); font-size:0.82rem; font-weight:700; cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  /* Progress bar */
+  .progress-bar-wrap {
+    background:#e2e8f0; border-radius:10px; height:6px;
+    margin-bottom:12px; overflow:hidden;
+  }
+  .progress-bar-fill {
+    height:100%; background:linear-gradient(90deg,var(--teal),#14b8a6);
+    border-radius:10px; transition:width 0.5s ease;
   }
 
   .mystery-box {
@@ -92,33 +167,49 @@
   .next-clue-btn {
     background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3);
     border-radius:10px; padding:8px 16px; color:white; font-size:0.83rem;
-    cursor:pointer; -webkit-tap-highlight-color:transparent;
+    cursor:pointer; -webkit-tap-highlight-color:transparent; transition:opacity 0.2s;
   }
-  .next-clue-btn:disabled { opacity:0.4; }
+  .next-clue-btn:disabled { opacity:0.35; }
 
   .choices-label { text-align:center; color:var(--text); font-size:0.88rem; font-weight:600; margin-bottom:8px; }
-  .choices-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; max-width:420px; margin:0 auto; }
-
+  .choices-grid  { display:grid; grid-template-columns:1fr 1fr; gap:10px; max-width:420px; margin:0 auto; }
   .choice-card {
     background:var(--card); border-radius:16px; padding:14px 8px;
     text-align:center; cursor:pointer; border:3px solid #e2e8f0;
     box-shadow:var(--shadow); transition:transform 0.12s;
     -webkit-tap-highlight-color:transparent;
   }
-  .choice-card:active { transform:scale(0.93); }
-  .choice-emoji { font-size:4rem; display:block; line-height:1.1; }
-  .choice-name  { display:block; margin-top:6px; font-size:0.92rem; font-weight:700; color:var(--text); }
-  .choice-card.correct { border-color:#10b981; background:#f0fdf4; }
-  .choice-card.wrong   { border-color:var(--pink); background:#fff1f2; }
+  .choice-card:active { transform:scale(0.92); }
+  .choice-emoji { font-size:3.8rem; display:block; line-height:1.15; }
+  .choice-svg { width:90px; height:90px; margin:0 auto 2px; display:block; }
+  .choice-svg svg { width:90px; height:90px; }
+  .choice-name  { display:block; margin-top:5px; font-size:0.9rem; font-weight:700; color:var(--text); }
+  .choice-card.correct { border-color:#10b981; background:#f0fdf4; animation:popIn 0.3s ease; }
+  .choice-card.wrong   { border-color:var(--pink); background:#fff1f2; animation:shake 0.3s ease; }
+  @keyframes popIn  { 0%{transform:scale(0.9)} 60%{transform:scale(1.06)} 100%{transform:scale(1)} }
+  @keyframes shake  { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
 
   .result-msg {
     text-align:center; padding:10px; border-radius:12px;
-    font-size:1rem; font-weight:700; margin-top:10px;
+    font-size:0.98rem; font-weight:700; margin-top:10px;
     display:none; max-width:420px; margin-left:auto; margin-right:auto;
+    animation:slideIn 0.3s ease;
   }
   .result-msg.show    { display:block; }
   .result-msg.correct { background:#d1fae5; color:#065f46; }
   .result-msg.wrong   { background:#ffe4e6; color:#9f1239; }
+
+  /* ====== بطاقة "تعلّمت اليوم" ====== */
+  .fact-card {
+    display:none; max-width:420px; margin:10px auto 0;
+    background:linear-gradient(135deg,#fef9c3,#fef3c7);
+    border:2px solid var(--yellow); border-radius:14px;
+    padding:12px 14px; text-align:right;
+    animation:slideIn 0.4s ease;
+  }
+  .fact-card.show { display:block; }
+  .fact-title { font-size:0.78rem; font-weight:700; color:#92400e; margin-bottom:4px; }
+  .fact-text  { font-size:0.88rem; color:#78350f; line-height:1.5; }
 
   .next-q-btn {
     display:none; margin:10px auto 0;
@@ -126,48 +217,74 @@
     color:white; border:none; border-radius:12px;
     padding:12px 26px; font-size:0.95rem; font-weight:700;
     cursor:pointer; -webkit-tap-highlight-color:transparent;
+    transition:transform 0.12s;
   }
+  .next-q-btn:active { transform:scale(0.96); }
   .next-q-btn.show { display:block; }
 
-  /* END */
-  #screen-end { display:none; padding:28px 18px; text-align:center; }
-  .trophy { font-size:4rem; margin-bottom:10px; }
+  /* ====== END ====== */
+  #screen-end { padding:28px 18px; text-align:center; }
+  .trophy    { font-size:4.5rem; margin-bottom:8px; animation:logoBounce 1s ease infinite alternate; }
   .end-title { font-size:1.4rem; font-weight:800; color:var(--text); margin-bottom:6px; }
-  .end-score { font-size:1rem; color:var(--teal); font-weight:700; margin-bottom:18px; }
-  .stars { font-size:2rem; margin-bottom:14px; letter-spacing:4px; }
+  .end-score { font-size:1rem; color:var(--teal); font-weight:700; margin-bottom:6px; }
+  .stars     { font-size:2.2rem; margin-bottom:16px; letter-spacing:4px; }
+  .end-detail{ font-size:0.82rem; color:#64748b; margin-bottom:18px; }
   .replay-btn {
     background:linear-gradient(135deg,var(--teal),var(--teal-dark));
     color:white; border:none; border-radius:12px;
     padding:13px 28px; font-size:0.95rem; font-weight:700; cursor:pointer; margin:5px;
+    -webkit-tap-highlight-color:transparent;
   }
   .home-btn {
     background:var(--card); color:var(--teal);
     border:2px solid var(--teal); border-radius:12px;
     padding:11px 24px; font-size:0.95rem; font-weight:700; cursor:pointer; margin:5px;
+    -webkit-tap-highlight-color:transparent;
   }
 
-  /* Confetti */
+  /* ====== FOOTER ====== */
+  footer {
+    text-align:center; padding:14px 10px;
+    font-size:0.75rem; color:#64748b;
+    border-top:1px solid #e2e8f0;
+    margin-top:24px; font-weight:600; letter-spacing:0.3px;
+  }
+
+  /* ====== CONFETTI ====== */
   .confetti-piece {
     position:fixed; border-radius:2px;
-    animation:confettiFall 1.5s ease-in forwards;
-    pointer-events:none; z-index:999;
+    animation:confettiFall 1.6s ease-in forwards;
+    pointer-events:none; z-index:9998;
   }
   @keyframes confettiFall {
-    0%   { transform:translateY(-20px) rotate(0deg); opacity:1; }
-    100% { transform:translateY(100vh) rotate(720deg); opacity:0; }
+    0%  { transform:translateY(-20px) rotate(0deg); opacity:1; }
+    100%{ transform:translateY(100vh) rotate(720deg); opacity:0; }
   }
 </style>
 </head>
 <body>
 
+<!-- ====== SPLASH ====== -->
+<div id="splash">
+  <div class="splash-logo">🔍</div>
+  <div class="splash-title">من أنا؟</div>
+  <div class="splash-sub">خمّن الشخصية من التلميحات</div>
+  <div class="splash-brand">✨ رنيم فاي | التّعليم الممتع ✨</div>
+  <div class="splash-dots">
+    <div class="splash-dot"></div>
+    <div class="splash-dot"></div>
+    <div class="splash-dot"></div>
+  </div>
+</div>
+
 <header>
-  <div class="brand">رنيم فاي</div>
+  <div class="brand">✨ رنيم فاي | التّعليم الممتع ✨</div>
   <h1>🔍 من أنا؟</h1>
   <p>خمّن من التلميحات</p>
 </header>
 
-<!-- CATEGORIES -->
-<div id="screen-categories">
+<!-- ====== CATEGORIES ====== -->
+<div id="screen-categories" class="screen">
   <p class="screen-title">اختر فئة للعب</p>
   <div class="categories-grid">
     <div class="cat-card" data-cat="animals" onclick="startGame('animals')">
@@ -182,16 +299,25 @@
     <div class="cat-card" data-cat="school" onclick="startGame('school')">
       <span class="cat-emoji">📚</span><span class="cat-name">البيئة المدرسية</span>
     </div>
+    <div class="cat-card" data-cat="body" onclick="startGame('body')">
+      <span class="cat-emoji">🫀</span><span class="cat-name">جسم الإنسان</span>
+    </div>
+    <div class="cat-card" data-cat="transport" onclick="startGame('transport')">
+      <span class="cat-emoji">🚗</span><span class="cat-name">وسائل النقل</span>
+    </div>
   </div>
   <button class="all-btn" onclick="startGame('all')">🎲 العب بكل الفئات</button>
 </div>
 
-<!-- GAME -->
-<div id="screen-game">
+<!-- ====== GAME ====== -->
+<div id="screen-game" class="screen">
   <div class="game-header">
     <button class="back-btn" onclick="goHome()">← رجوع</button>
     <div class="score-box">⭐ <span id="score-display">0</span></div>
     <div class="score-box">س <span id="q-num">1</span>/<span id="q-total">10</span></div>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progress-bar" style="width:0%"></div>
   </div>
   <div class="mystery-box">
     <div class="mystery-label">🔎 من أنا؟ اقرأ التلميحات</div>
@@ -201,136 +327,305 @@
   <p class="choices-label">اختر الإجابة الصحيحة:</p>
   <div class="choices-grid" id="choices-grid"></div>
   <div class="result-msg" id="result-msg"></div>
+  <div class="fact-card"  id="fact-card">
+    <div class="fact-title">💡 هل تعلمت اليوم؟</div>
+    <div class="fact-text" id="fact-text"></div>
+  </div>
   <button class="next-q-btn" id="next-q-btn" onclick="nextQuestion()">التالي ←</button>
 </div>
 
-<!-- END -->
-<div id="screen-end">
+<!-- ====== END ====== -->
+<div id="screen-end" class="screen">
   <div class="trophy" id="end-trophy">🏆</div>
-  <div class="stars" id="end-stars">⭐⭐⭐</div>
+  <div class="stars"  id="end-stars">⭐⭐⭐</div>
   <div class="end-title" id="end-title">أحسنت!</div>
-  <div class="end-score" id="end-score"></div>
+  <div class="end-score"  id="end-score"></div>
+  <div class="end-detail" id="end-detail"></div>
   <button class="replay-btn" onclick="replayGame()">العب مجدداً 🔄</button>
   <button class="home-btn"   onclick="goHome()">🏠 الرئيسية</button>
 </div>
 
+<footer>
+  سميرة عبد الصّدوق &mdash; جميع الحقوق محفوظة &copy; 2026
+</footer>
+
 <script>
 // ============================================================
-// DATA  — emoji بدل SVG
+// DATA — مع حقيقة تربوية لكل سؤال
 // ============================================================
 const DATA = {
   animals: [
-    { name:"الأسد",    clues:["أنا ملك الغابة","لدي لبدة كثيفة حول رأسي","أزأر بصوت قوي جداً","أعيش في السافانا الأفريقية"],
+    { name:"الأسد", clues:["أنا ملك الغابة","لدي لبدة كثيفة حول رأسي","أزأر بصوت قوي جداً","أعيش في السافانا الأفريقية"],
       choices:["الأسد","النمر","الفيل","الزرافة"], answer:"الأسد",
-      emojis:{"الأسد":"🦁","النمر":"🐯","الفيل":"🐘","الزرافة":"🦒"} },
+      emojis:{"الأسد":"🦁","النمر":"🐯","الفيل":"🐘","الزرافة":"🦒"},
+      fact:"زئير الأسد يُسمع على بُعد 8 كيلومترات! وتعيش الأسود في مجموعات تُسمى 'قطيع'." },
 
-    { name:"الفيل",   clues:["أنا أكبر حيوان بري","لدي خرطوم طويل جداً","أذناي كبيرتان كالمراوح","أحب الاستحمام في النهر"],
+    { name:"الفيل", clues:["أنا أكبر حيوان بري","لدي خرطوم طويل جداً","أذناي كبيرتان كالمراوح","أحب الاستحمام في النهر"],
       choices:["الحصان","الفيل","الكركدن","أفراس النهر"], answer:"الفيل",
-      emojis:{"الحصان":"🐴","الفيل":"🐘","الكركدن":"🦏","أفراس النهر":"🦛"} },
+      emojis:{"الحصان":"🐴","الفيل":"🐘","الكركدن":"🦏","أفراس النهر":"🦛"},
+      fact:"يستطيع الفيل أن يشرب 200 لتر من الماء في اليوم الواحد بخرطومه الطويل!" },
 
-    { name:"الببغاء",  clues:["أنا طائر ملوّن جميل","أستطيع تقليد الكلام","لدي منقار معقوف","أعيش في الغابات الاستوائية"],
+    { name:"الببغاء", clues:["أنا طائر ملوّن جميل","أستطيع تقليد الكلام","لدي منقار معقوف","أعيش في الغابات الاستوائية"],
       choices:["النسر","البومة","الببغاء","البطريق"], answer:"الببغاء",
-      emojis:{"النسر":"🦅","البومة":"🦉","الببغاء":"🦜","البطريق":"🐧"} },
+      emojis:{"النسر":"🦅","البومة":"🦉","الببغاء":"🦜","البطريق":"🐧"},
+      fact:"بعض الببغاوات تعيش أكثر من 80 سنة، وتستطيع تعلّم مئات الكلمات!" },
 
-    { name:"السمكة",  clues:["أعيش في الماء","أتنفس بالخياشيم","لدي زعانف للسباحة","أضع بيوضي في الماء"],
+    { name:"السمكة", clues:["أعيش في الماء","أتنفس بالخياشيم","لدي زعانف للسباحة","أضع بيوضي في الماء"],
       choices:["السلحفاة","السمكة","الضفدع","الحوت"], answer:"السمكة",
-      emojis:{"السلحفاة":"🐢","السمكة":"🐟","الضفدع":"🐸","الحوت":"🐳"} },
+      emojis:{"السلحفاة":"🐢","السمكة":"🐟","الضفدع":"🐸","الحوت":"🐳"},
+      fact:"في المحيطات أكثر من 30,000 نوع من الأسماك، وبعضها يضيء في الظلام!" },
 
-    { name:"الأرنب",  clues:["أذناي طويلتان جداً","أقفز بدلاً من المشي","فراؤي ناعم ودافئ","أحب أكل الجزر"],
+    { name:"الأرنب", clues:["أذناي طويلتان جداً","أقفز بدلاً من المشي","فراؤي ناعم ودافئ","أحب أكل الجزر"],
       choices:["الأرنب","القنفذ","السنجاب","الفأر"], answer:"الأرنب",
-      emojis:{"الأرنب":"🐰","القنفذ":"🦔","السنجاب":"🐿️","الفأر":"🐭"} },
+      emojis:{"الأرنب":"🐰","القنفذ":"🦔","السنجاب":"🐿️","الفأر":"🐭"},
+      fact:"الأرنب يستطيع القفز 3 أمتار دفعة واحدة، وأذناه تساعدانه على سماع الأصوات من بعيد جداً!" },
 
-    { name:"القرد",   clues:["أتسلق الأشجار بسرعة","ذيلي طويل","أحب الموز كثيراً","أشبه الإنسان في شكله"],
+    { name:"القرد", clues:["أتسلق الأشجار بسرعة","ذيلي طويل","أحب الموز كثيراً","أشبه الإنسان في شكله"],
       choices:["القرد","الدب","الكنغر","الذئب"], answer:"القرد",
-      emojis:{"القرد":"🐒","الدب":"🐻","الكنغر":"🦘","الذئب":"🐺"} },
+      emojis:{"القرد":"🐒","الدب":"🐻","الكنغر":"🦘","الذئب":"🐺"},
+      fact:"القرود تتواصل مع بعضها بأصوات وإيماءات تشبه لغة الإشارة عند البشر!" },
   ],
 
   jobs: [
-    { name:"الطبيب",       clues:["أرتدي معطفاً أبيض","أعالج المرضى","أستعمل السماعة الطبية","أعمل في المستشفى"],
+    { name:"الطبيب", clues:["أرتدي معطفاً أبيض","أعالج المرضى","أستعمل السماعة الطبية","أعمل في المستشفى"],
       choices:["الطبيب","المهندس","المعلم","الطباخ"], answer:"الطبيب",
-      emojis:{"الطبيب":"👨‍⚕️","المهندس":"👷","المعلم":"👨‍🏫","الطباخ":"👨‍🍳"} },
+      emojis:{"الطبيب":"👨‍⚕️","المهندس":"👷","المعلم":"👨‍🏫","الطباخ":"👨‍🍳"},
+      fact:"يحتاج الطبيب لدراسة 7 سنوات على الأقل قبل أن يبدأ في علاج المرضى!" },
 
-    { name:"المعلم",       clues:["أعمل في المدرسة","أشرح الدروس وأساعد التلاميذ","أستعمل السبورة","أصحح الواجبات"],
+    { name:"المعلم", clues:["أعمل في المدرسة","أشرح الدروس وأساعد التلاميذ","أستعمل السبورة","أصحح الواجبات"],
       choices:["الشرطي","المعلم","الممرضة","المزارع"], answer:"المعلم",
-      emojis:{"الشرطي":"👮","المعلم":"👨‍🏫","الممرضة":"👩‍⚕️","المزارع":"👨‍🌾"} },
+      emojis:{"الشرطي":"👮","المعلم":"👨‍🏫","الممرضة":"👩‍⚕️","المزارع":"👨‍🌾"},
+      fact:"يقال إن المعلم الجيد يُغيّر مصير أجيال كاملة. مهنة التعليم من أشرف المهن!" },
 
     { name:"رجل الإطفاء", clues:["أرتدي خوذة وبدلة خاصة","أطفئ الحرائق","أستعمل خرطوم الماء","أسمع صفارة سيارتي"],
       choices:["رجل الإطفاء","البحار","الطيار","الشرطي"], answer:"رجل الإطفاء",
-      emojis:{"رجل الإطفاء":"👨‍🚒","البحار":"⚓","الطيار":"👨‍✈️","الشرطي":"👮"} },
+      emojis:{"رجل الإطفاء":"👨‍🚒","البحار":"⚓","الطيار":"👨‍✈️","الشرطي":"👮"},
+      fact:"بدلة رجل الإطفاء تزن 20 كيلوغراماً وتحميه من حرارة تصل إلى 1000 درجة!" },
 
-    { name:"الطباخ",       clues:["أرتدي قبعة بيضاء طويلة","أطبخ الأطعمة اللذيذة","أعمل في المطعم","أستعمل الأواني"],
+    { name:"الطباخ", clues:["أرتدي قبعة بيضاء طويلة","أطبخ الأطعمة اللذيذة","أعمل في المطعم","أستعمل الأواني"],
       choices:["الخباز","الطباخ","الميكانيكي","البستاني"], answer:"الطباخ",
-      emojis:{"الخباز":"🥐","الطباخ":"👨‍🍳","الميكانيكي":"🔧","البستاني":"👨‍🌾"} },
+      emojis:{"الخباز":"🥐","الطباخ":"👨‍🍳","الميكانيكي":"🔧","البستاني":"👨‍🌾"},
+      fact:"القبعة البيضاء الطويلة للطباخ سُمّيت 'توك' وكانت قديماً تدل على درجة خبرته!" },
 
-    { name:"المزارع",      clues:["أعمل في الحقل","أزرع الخضروات والفواكه","أستيقظ مبكراً جداً","الطبيعة هي مكان عملي"],
+    { name:"المزارع", clues:["أعمل في الحقل","أزرع الخضروات والفواكه","أستيقظ مبكراً جداً","الطبيعة هي مكان عملي"],
       choices:["المزارع","الطيار","الطبيب","المعلم"], answer:"المزارع",
-      emojis:{"المزارع":"👨‍🌾","الطيار":"👨‍✈️","الطبيب":"👨‍⚕️","المعلم":"👨‍🏫"} },
+      emojis:{"المزارع":"👨‍🌾","الطيار":"👨‍✈️","الطبيب":"👨‍⚕️","المعلم":"👨‍🏫"},
+      fact:"المزارع يُطعم العالم كله! بدون الزراعة لن يجد أحد ما يأكله." },
   ],
 
   fruits: [
-    { name:"التفاحة",   clues:["لوني أحمر أو أخضر","شكلي مستدير","أنمو على الشجر","قشرتي ناعمة ولحمي مقرمش"],
+    { name:"التفاحة", clues:["لوني أحمر أو أخضر","شكلي مستدير","أنمو على الشجر","قشرتي ناعمة ولحمي مقرمش"],
       choices:["التفاحة","البرتقال","العنب","الخوخ"], answer:"التفاحة",
-      emojis:{"التفاحة":"🍎","البرتقال":"🍊","العنب":"🍇","الخوخ":"🍑"} },
+      emojis:{"التفاحة":"🍎","البرتقال":"🍊","العنب":"🍇","الخوخ":"🍑"},
+      fact:"تفاحة واحدة كل يوم تُقلّل من زيارة الطبيب! وفيها ألياف تُساعد الهضم." },
 
-    { name:"الموزة",    clues:["شكلي منحنٍ كالهلال","قشرتي صفراء عند النضج","أنمو في عناقيد","القرود تحبني كثيراً"],
+    { name:"الموزة", clues:["شكلي منحنٍ كالهلال","قشرتي صفراء عند النضج","أنمو في عناقيد","القرود تحبني كثيراً"],
       choices:["المانغو","الأناناس","الموزة","الكمثرى"], answer:"الموزة",
-      emojis:{"المانغو":"🥭","الأناناس":"🍍","الموزة":"🍌","الكمثرى":"🍐"} },
+      emojis:{"المانغو":"🥭","الأناناس":"🍍","الموزة":"🍌","الكمثرى":"🍐"},
+      fact:"الموزة تحتوي على البوتاسيوم الذي يُقوّي العضلات ويُعطيك طاقة سريعة!" },
 
-    { name:"الجزرة",    clues:["لوني برتقالي","أنمو تحت الأرض","أوراقي الخضراء فوق التربة","الأرانب تحبني جداً"],
+    { name:"الجزرة", clues:["لوني برتقالي","أنمو تحت الأرض","أوراقي الخضراء فوق التربة","الأرانب تحبني جداً"],
       choices:["البطاطا","الفجل","الجزرة","الشمندر"], answer:"الجزرة",
-      emojis:{"البطاطا":"🥔","الفجل":"🌱","الجزرة":"🥕","الشمندر":"🟣"} },
+      emojis:{"البطاطا":"🥔","الفجل":"🌱","الجزرة":"🥕","الشمندر":"🟣"},
+      fact:"الجزرة غنية بفيتامين A الذي يُقوّي النظر ويُحافظ على صحة العيون!" },
 
-    { name:"البطيخ",    clues:["حجمي كبير وثقيل","قشرتي خضراء ولحمي أحمر","أحتوي على بذور سوداء","أنا فاكهة الصيف"],
+    { name:"البطيخ", clues:["حجمي كبير وثقيل","قشرتي خضراء ولحمي أحمر","أحتوي على بذور سوداء","أنا فاكهة الصيف"],
       choices:["الشمام","البطيخ","القرع","الليمون"], answer:"البطيخ",
-      emojis:{"الشمام":"🍈","البطيخ":"🍉","القرع":"🎃","الليمون":"🍋"} },
+      emojis:{"الشمام":"🍈","البطيخ":"🍉","القرع":"🎃","الليمون":"🍋"},
+      fact:"البطيخ يتكوّن من 92٪ ماء! لذلك هو مثالي لترطيب الجسم في الصيف." },
 
-    { name:"الفراولة",  clues:["لوني أحمر ومنقّط بنقاط صفراء","شكلي كالقلب","أنمو قريباً من الأرض","طعمي حلو ومنعش"],
+    { name:"الفراولة", clues:["لوني أحمر ومنقّط","شكلي كالقلب","أنمو قريباً من الأرض","طعمي حلو ومنعش"],
       choices:["التوت","الفراولة","الكرز","العنب"], answer:"الفراولة",
-      emojis:{"التوت":"🫐","الفراولة":"🍓","الكرز":"🍒","العنب":"🍇"} },
+      emojis:{"التوت":"🫐","الفراولة":"🍓","الكرز":"🍒","العنب":"🍇"},
+      fact:"الفراولة تحتوي على فيتامين C أكثر من البرتقال وهي تُقوّي المناعة!" },
   ],
 
   school: [
-    { name:"المسطرة",      clues:["أنا مستطيلة وطويلة","أُستعمل لرسم الخطوط المستقيمة","عليّ أرقام للقياس","أُصنع من البلاستيك أو الخشب"],
+    { name:"المسطرة", clues:["أنا مستطيلة وطويلة","أُستعمل لرسم الخطوط المستقيمة","عليّ أرقام للقياس","أُصنع من البلاستيك أو الخشب"],
       choices:["المسطرة","المقص","الممحاة","المنقلة"], answer:"المسطرة",
-      emojis:{"المسطرة":"📏","المقص":"✂️","الممحاة":"🧹","المنقلة":"📐"} },
+      emojis:{"المسطرة":"📏","المقص":"✂️","الممحاة":"🧹","المنقلة":"📐"},
+      fact:"أول مسطرة في التاريخ صُنعت من الحجر قبل 4000 سنة في حضارة وادي السند!" },
 
     { name:"القلم الرصاص", clues:["أكتب وأُمحى بسهولة","قلبي من الغرافيت الرمادي","أحتاج براية لأبقى حاداً","أنا أول صديق للتلميذ"],
       choices:["القلم الحبر","القلم الرصاص","الطباشير","الماركر"], answer:"القلم الرصاص",
-      emojis:{"القلم الحبر":"🖊️","القلم الرصاص":"✏️","الطباشير":"🖍️","الماركر":"🖍️"} },
+      emojis:{"القلم الحبر":"🖊️","القلم الرصاص":"✏️","الطباشير":"🖍️","الماركر":"🖌️"},
+      fact:"قلم الرصاص الواحد يكفي لرسم خط طوله 56 كيلومتراً أو كتابة 45,000 كلمة!" },
 
-    { name:"المحفظة",      clues:["أحمل الكتب والأدوات","التلاميذ يضعونني على ظهورهم","لدي جيوب وسحّابات","أُعدّ في الصباح قبل المدرسة"],
+    { name:"المحفظة", clues:["أحمل الكتب والأدوات","التلاميذ يضعونني على ظهورهم","لدي جيوب وسحّابات","أُعدّ في الصباح قبل المدرسة"],
       choices:["الحقيبة الرياضية","المحفظة","الحافظة","العلبة"], answer:"المحفظة",
-      emojis:{"الحقيبة الرياضية":"👜","المحفظة":"🎒","الحافظة":"📁","العلبة":"📦"} },
+      emojis:{"الحقيبة الرياضية":"👜","المحفظة":"🎒","الحافظة":"📁","العلبة":"📦"},
+      fact:"يجب أن لا يتجاوز وزن المحفظة 10٪ من وزن جسم التلميذ حتى لا يتعب ظهره!" },
 
-    { name:"السبورة",      clues:["أنا على جدار الفصل","المعلم يكتب عليّ بالطباشير","أُمحى بالممسحة","الدرس يبدأ عليّ"],
+    { name:"السبورة", clues:["أنا على جدار الفصل","المعلم يكتب عليّ بالطباشير","أُمحى بالممسحة","الدرس يبدأ عليّ"],
       choices:["الشاشة","السبورة","اللوحة","الكتاب"], answer:"السبورة",
-      emojis:{"الشاشة":"📺","السبورة":"🖥️","اللوحة":"🎨","الكتاب":"📖"} },
+      emojis:{"الشاشة":"📺","السبورة":"🖥️","اللوحة":"🎨","الكتاب":"📖"},
+      fact:"أول سبورة مدرسية ظهرت في اسكتلندا عام 1801، وكانت لوحاً حجرياً كبيراً!" },
 
-    { name:"الكتاب",       clues:["أحمل المعرفة والعلم","لدي صفحات كثيرة","تقرأني بعيونك","المكتبة مليئة بي"],
+    { name:"الكتاب", clues:["أحمل المعرفة والعلم","لدي صفحات كثيرة","تقرأني بعيونك","المكتبة مليئة بي"],
       choices:["الكراس","الكتاب","المجلة","القاموس"], answer:"الكتاب",
-      emojis:{"الكراس":"📓","الكتاب":"📖","المجلة":"📰","القاموس":"📚"} },
+      emojis:{"الكراس":"📓","الكتاب":"📖","المجلة":"📰","القاموس":"📚"},
+      fact:"اقرأ 20 دقيقة يومياً وستتعلم أكثر من مليون كلمة جديدة في السنة!" },
+  ],
+
+  body: [
+    { name:"القلب", clues:["أنا عضلة تعمل بلا توقف","أضخّ الدم في جميع أنحاء الجسم","أنبض نحو 100,000 مرة في اليوم","أوجد في منتصف الصدر"],
+      choices:["القلب","الرئة","الكبد","المعدة"], answer:"القلب",
+      svgs:{"القلب":"🫀","الرئة":"🫁","الكبد":`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+<path d="M10 40 C8 22 20 8 38 10 C55 8 72 20 70 38 C68 55 55 70 38 72 C22 72 12 58 10 40Z" fill="#c8783a" stroke="#8b4513" stroke-width="3"/>
+<path d="M16 30 Q24 20 36 24" fill="none" stroke="#e8a060" stroke-width="3" stroke-linecap="round"/>
+<path d="M14 44 Q20 35 32 38" fill="none" stroke="#e8a060" stroke-width="2.5" stroke-linecap="round"/>
+<circle cx="50" cy="26" r="7" fill="#a05820"/>
+<circle cx="56" cy="38" r="5" fill="#a05820"/>
+<circle cx="46" cy="46" r="4" fill="#a05820"/>
+</svg>`,"المعدة":`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+<path d="M28 14 C16 14 12 28 14 42 C16 56 26 70 42 70 C58 70 66 56 68 42 C70 28 66 14 54 14 C46 14 42 20 38 20 C34 20 32 14 28 14Z" fill="#7ec850" stroke="#4a8a20" stroke-width="3"/>
+<path d="M28 14 C24 8 30 4 36 8 C40 10 40 16 34 16" fill="#5aaa30" stroke="#4a8a20" stroke-width="2"/>
+<path d="M54 14 C58 8 64 10 64 16 C64 20 60 22 57 20" fill="#5aaa30" stroke="#4a8a20" stroke-width="2"/>
+<path d="M22 36 Q32 28 44 32" fill="none" stroke="#aee880" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M20 48 Q30 42 40 45" fill="none" stroke="#aee880" stroke-width="2" stroke-linecap="round"/>
+</svg>`},
+      fact:"قلبك يضخّ ما يكفي من الدم في حياتك لملء أكثر من مليون حوض سباحة!" },
+
+    { name:"العين", clues:["أنا عضو الرؤية","أتأثر بالضوء والظلام","بي بؤبؤ يتسع في الظلام","الدموع تخرج مني"],
+      choices:["العين","الأذن","الأنف","الفم"], answer:"العين",
+      emojis:{"العين":"👁️","الأذن":"👂","الأنف":"👃","الفم":"👄"},
+      fact:"العين البشرية تستطيع تمييز أكثر من 10 مليون لون مختلف!" },
+
+    { name:"الأسنان", clues:["أنا موجودة داخل الفم","أساعد على مضغ الطعام","أحتاج إلى فرشاة يومياً","أول مجموعة مني تسمى اللبنية"],
+      choices:["الأسنان","اللسان","الشفاه","الفم"], answer:"الأسنان",
+      emojis:{"الأسنان":"🦷","اللسان":"👅","الشفاه":"💋","الفم":"👄"},
+      fact:"الأسنان هي الجزء الوحيد في جسمك الذي لا يستطيع إصلاح نفسه — لذلك اعتنِ بها!" },
+
+    { name:"الدماغ", clues:["أنا مركز التفكير والذاكرة","أتحكم في كل أجزاء الجسم","أسكن داخل الجمجمة","أعمل حتى أثناء النوم"],
+      choices:["الدماغ","القلب","العين","الأذن"], answer:"الدماغ",
+      emojis:{"الدماغ":"🧠","القلب":"🫀","العين":"👁️","الأذن":"👂"},
+      fact:"دماغك يولّد طاقة كهربائية كافية لإضاءة مصباح صغير! ويحتوي على 86 مليار خلية عصبية." },
+
+    { name:"اليد", clues:["أنا أداة الإمساك والكتابة","لديّ خمسة أصابع","ببصماتي أُعرَّف عن غيري","أساعدك على اللمس والشعور"],
+      choices:["اليد","القدم","الذراع","الأصابع"], answer:"اليد",
+      emojis:{"اليد":"✋","القدم":"🦶","الذراع":"💪","الأصابع":"🤏"},
+      fact:"في يدك الواحدة 27 عظمة، وأطراف أصابعك من أكثر أجزاء الجسم حساسيةً للمس!" },
+
+    { name:"الأذن", clues:["أنا عضو السمع","أساعد على الاتزان والتوازن","الصوت يصلني على شكل موجات","بي أصغر عظمة في الجسم"],
+      choices:["الأذن","العين","الأنف","اللسان"], answer:"الأذن",
+      emojis:{"الأذن":"👂","العين":"👁️","الأنف":"👃","اللسان":"👅"},
+      fact:"أصغر عظمة في جسمك هي الرِّكاب في أذنك، لا يتجاوز حجمها حبة أرز!" },
+  ],
+
+  transport: [
+    { name:"الطائرة", clues:["أطير في السماء","أنقل المسافرين بين البلدان","لدي أجنحة ضخمة","أقلع من المطار"],
+      choices:["الطائرة","الصاروخ","الطائرة المروحية","المنطاد"], answer:"الطائرة",
+      emojis:{"الطائرة":"✈️","الصاروخ":"🚀","الطائرة المروحية":"🚁","المنطاد":"🎈"},
+      fact:"الطائرة التجارية تطير بسرعة 900 كم/ساعة وتحمل ما يصل إلى 850 راكباً!" },
+
+    { name:"القطار", clues:["أسير على قضبان حديدية","لدي عربات كثيرة متصلة","أنقل الركاب والبضائع","أتوقف في المحطات"],
+      choices:["القطار","الترام","مترو الأنفاق","الحافلة"], answer:"القطار",
+      emojis:{"القطار":"🚂","الترام":"🚃","مترو الأنفاق":"🚇","الحافلة":"🚌"},
+      fact:"أسرع قطار في العالم هو القطار الياباني 'ماغليف' يصل إلى 603 كم/ساعة!" },
+
+    { name:"السفينة", clues:["أسبح فوق الماء","أنقل البضائع عبر المحيطات","لديّ مرساة ثقيلة","أرسو في الميناء"],
+      choices:["السفينة","الغواصة","الزورق","العبّارة"], answer:"السفينة",
+      emojis:{"السفينة":"🚢","الغواصة":"🤿","الزورق":"⛵","العبّارة":"⛴️"},
+      fact:"أكبر سفينة في العالم طولها 400 متر — أطول من برج إيفل بمرتين!" },
+
+    { name:"الدراجة", clues:["لديّ عجلتان","أسير بقوة ساقيك","لا أحتاج وقوداً","صديقة للبيئة"],
+      choices:["الدراجة","الدراجة النارية","السكوتر","العجلة"], answer:"الدراجة",
+      emojis:{"الدراجة":"🚲","الدراجة النارية":"🏍️","السكوتر":"🛵","العجلة":"⚙️"},
+      fact:"الدراجة اختُرعت عام 1817، وهي من أكثر وسائل النقل صداقةً للبيئة!" },
+
+    { name:"سيارة الإسعاف", clues:["أنا سيارة الطوارئ","صفارتي تُحذّر الجميع","أنقل المرضى بسرعة","فيّ أطباء ومعدات إنقاذ"],
+      choices:["سيارة الإسعاف","سيارة الشرطة","سيارة الإطفاء","التاكسي"], answer:"سيارة الإسعاف",
+      emojis:{"سيارة الإسعاف":"🚑","سيارة الشرطة":"🚔","سيارة الإطفاء":"🚒","التاكسي":"🚕"},
+      fact:"سيارة الإسعاف يجب أن تصل إلى أي مكان خلال 8 دقائق في المدن لإنقاذ الأرواح!" },
+
+    { name:"الحافلة المدرسية", clues:["لوني أصفر مميز","أنقل التلاميذ إلى المدرسة","أتوقف في محطات محددة","السائق يعرف كل الأطفال"],
+      choices:["الحافلة المدرسية","الحافلة العادية","الميكروباص","الترام"], answer:"الحافلة المدرسية",
+      emojis:{"الحافلة المدرسية":"🚌","الحافلة العادية":"🚍","الميكروباص":"🚐","الترام":"🚃"},
+      fact:"اللون الأصفر للحافلة المدرسية اختُير لأن العين البشرية تراه أسرع من أي لون آخر!" },
   ],
 };
 
 // ============================================================
 // STATE
 // ============================================================
-let state = { category:null, questions:[], currentIndex:0, currentClue:0, score:0, answered:false };
+let state = {
+  category:null, questions:[], currentIndex:0,
+  currentClue:0, score:0, answered:false,
+  correct:0, wrong:0
+};
 
-// TTS
-let voices = [];
-window.speechSynthesis.onvoiceschanged = () => { voices = window.speechSynthesis.getVoices(); };
-voices = window.speechSynthesis.getVoices();
+// ============================================================
+// TTS — Samsung Galaxy / Android
+// ============================================================
+var synth = window.speechSynthesis || null;
+
+function getArVoice() {
+  try {
+    var all = synth ? synth.getVoices() : [];
+    return all.find(function(v){ return v.lang==='ar-SA'; })
+        || all.find(function(v){ return v.lang==='ar-EG'; })
+        || all.find(function(v){ return v.lang==='ar-DZ'; })
+        || all.find(function(v){ return v.lang.startsWith('ar'); })
+        || null;
+  } catch(e){ return null; }
+}
+
+// تفعيل السياق الصوتي عند أول لمسة
+var ttsUnlocked = false;
+document.addEventListener('touchstart', function unlock() {
+  if (ttsUnlocked || !synth) return;
+  try {
+    var u = new SpeechSynthesisUtterance(' ');
+    u.volume = 0; u.lang = 'ar-SA';
+    synth.speak(u);
+    ttsUnlocked = true;
+  } catch(e) {}
+  document.removeEventListener('touchstart', unlock);
+}, { once: true });
+
+var speakQueue = [];
+var isSpeaking = false;
 
 function speak(text) {
-  window.speechSynthesis.cancel();
-  setTimeout(() => {
-    const u = new SpeechSynthesisUtterance(text);
-    const ar = voices.find(v=>v.lang==='ar-SA') || voices.find(v=>v.lang.startsWith('ar'));
-    if(ar) u.voice = ar;
-    u.lang='ar-SA'; u.rate=0.85;
-    window.speechSynthesis.speak(u);
-  }, 80);
+  if (!synth || !text) return;
+  speakQueue = []; // امسح القديم
+  speakQueue.push(text);
+  if (!isSpeaking) processQueue();
+}
+
+function processQueue() {
+  if (!speakQueue.length) { isSpeaking = false; return; }
+  isSpeaking = true;
+  var text = speakQueue.shift();
+
+  try { synth.cancel(); } catch(e) {}
+
+  setTimeout(function() {
+    try {
+      var u = new SpeechSynthesisUtterance(text);
+      var v = getArVoice();
+      if (v) { u.voice = v; }
+      u.lang   = 'ar-SA';
+      u.rate   = 0.80;
+      u.pitch  = 1.0;
+      u.volume = 1.0;
+
+      u.onend   = function() { isSpeaking = false; };
+      u.onerror = function() { isSpeaking = false; };
+
+      // Android watchdog: إذا لم يبدأ خلال 3 ثواني أعد المحاولة
+      var started = false;
+      u.onstart = function() { started = true; };
+      setTimeout(function() {
+        if (!started) {
+          isSpeaking = false;
+          try { synth.cancel(); synth.speak(u); } catch(e2) {}
+        }
+      }, 3000);
+
+      synth.speak(u);
+    } catch(e) { isSpeaking = false; }
+  }, 200);
 }
 
 function playSound(type) {
@@ -338,7 +633,7 @@ function playSound(type) {
     const ctx = new (window.AudioContext||window.webkitAudioContext)();
     const osc=ctx.createOscillator(), g=ctx.createGain();
     osc.connect(g); g.connect(ctx.destination);
-    if(type==='correct'){
+    if (type==='correct') {
       osc.frequency.setValueAtTime(523,ctx.currentTime);
       osc.frequency.setValueAtTime(659,ctx.currentTime+0.1);
       osc.frequency.setValueAtTime(784,ctx.currentTime+0.2);
@@ -352,8 +647,43 @@ function playSound(type) {
       g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.4);
       osc.start(); osc.stop(ctx.currentTime+0.4);
     }
-  } catch(e){}
+  } catch(e) {}
 }
+
+// ============================================================
+// SCREEN TRANSITIONS
+// ============================================================
+function showScreen(id) {
+  ['screen-categories','screen-game','screen-end'].forEach(s => {
+    const el = document.getElementById(s);
+    el.classList.remove('active');
+    setTimeout(() => { el.classList.remove('visible'); }, 380);
+  });
+  setTimeout(() => {
+    const target = document.getElementById(id);
+    target.classList.add('visible');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => { target.classList.add('active'); });
+    });
+  }, 400);
+}
+
+// ============================================================
+// SPLASH
+// ============================================================
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('splash').classList.add('hide');
+    setTimeout(() => {
+      document.getElementById('splash').style.display = 'none';
+      const cat = document.getElementById('screen-categories');
+      cat.classList.add('visible');
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => { cat.classList.add('active'); });
+      });
+    }, 650);
+  }, 2200);
+});
 
 // ============================================================
 // GAME LOGIC
@@ -362,41 +692,66 @@ function startGame(cat) {
   state.category = cat;
   let pool = cat==='all' ? Object.values(DATA).flat() : [...DATA[cat]];
   pool = pool.sort(()=>Math.random()-0.5);
-  state.questions = pool.slice(0, Math.min(10, pool.length));
+  state.questions   = pool.slice(0, Math.min(10, pool.length));
   state.currentIndex = 0;
-  state.score = 0;
+  state.score  = 0;
+  state.correct = 0;
+  state.wrong   = 0;
 
-  document.getElementById('screen-categories').style.display = 'none';
-  document.getElementById('screen-game').style.display = 'block';
-  document.getElementById('screen-end').style.display = 'none';
+  showScreen('screen-game');
   document.getElementById('q-total').textContent = state.questions.length;
-  renderQuestion();
+  setTimeout(renderQuestion, 300);
 }
 
 function renderQuestion() {
   const q = state.questions[state.currentIndex];
   state.currentClue = 0;
-  state.answered = false;
+  state.answered    = false;
 
   document.getElementById('score-display').textContent = state.score;
   document.getElementById('q-num').textContent = state.currentIndex + 1;
   document.getElementById('clues-container').innerHTML = '';
   document.getElementById('result-msg').className = 'result-msg';
+  document.getElementById('fact-card').className  = 'fact-card';
   document.getElementById('next-q-btn').className = 'next-q-btn';
+
+  // Progress bar
+  const pct = (state.currentIndex / state.questions.length) * 100;
+  document.getElementById('progress-bar').style.width = pct + '%';
 
   showClue();
 
   // Choices
   const grid = document.getElementById('choices-grid');
   grid.innerHTML = '';
-  [...q.choices].sort(()=>Math.random()-0.5).forEach(name => {
+  grid.style.opacity = '0';
+  [...q.choices].sort(()=>Math.random()-0.5).forEach((name, i) => {
     const card = document.createElement('div');
     card.className = 'choice-card';
-    card.innerHTML = `<span class="choice-emoji">${q.emojis[name]}</span><span class="choice-name">${name}</span>`;
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(16px)';
+    // دعم SVG أو إيموجي أو مختلط
+    var val = '';
+    if (q.svgs && q.svgs[name] !== undefined) val = q.svgs[name];
+    else if (q.emojis && q.emojis[name]) val = q.emojis[name];
+    else val = '❓';
+    var media = '';
+    if (typeof val === 'string' && val.trim().indexOf('<svg') === 0) {
+      media = '<div class="choice-svg">' + val + '</div>';
+    } else {
+      media = '<span class="choice-emoji">' + val + '</span>';
+    }
+    card.innerHTML = media + `<span class="choice-name">${name}</span>`;
     card.ontouchend = (e) => { e.preventDefault(); checkAnswer(name, card, q); };
     card.onclick    = ()  => checkAnswer(name, card, q);
     grid.appendChild(card);
+    setTimeout(() => {
+      card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    }, 100 + i * 80);
   });
+  setTimeout(() => { grid.style.opacity = '1'; }, 80);
 
   updateClueBtn(q);
 }
@@ -423,7 +778,7 @@ function showNextClue() {
 function updateClueBtn(q) {
   const btn = document.getElementById('next-clue-btn');
   const rem = q.clues.length - 1 - state.currentClue;
-  btn.disabled = rem<=0 || state.answered;
+  btn.disabled    = rem<=0 || state.answered;
   btn.textContent = rem>0 ? `تلميح آخر 💡 (${rem} متبقٍ)` : 'كل التلميحات ظهرت';
 }
 
@@ -435,31 +790,40 @@ function checkAnswer(chosen, card, q) {
   const correct = chosen === q.answer;
   document.querySelectorAll('.choice-card').forEach(c => {
     const nm = c.querySelector('.choice-name').textContent;
-    if (nm===q.answer) c.classList.add('correct');
+    if (nm===q.answer)         c.classList.add('correct');
     else if (nm===chosen && !correct) c.classList.add('wrong');
   });
 
   const resultEl = document.getElementById('result-msg');
+  const factCard = document.getElementById('fact-card');
   const nextBtn  = document.getElementById('next-q-btn');
   const isLast   = state.currentIndex >= state.questions.length-1;
 
   if (correct) {
     const pts = Math.max(4-state.currentClue, 1);
     state.score += pts;
+    state.correct++;
     document.getElementById('score-display').textContent = state.score;
-    resultEl.className = 'result-msg correct show';
+    resultEl.className   = 'result-msg correct show';
     resultEl.textContent = `🎉 أحسنت! +${pts} نقاط`;
     playSound('correct');
     confetti();
     speak('أحسنت إجابة صحيحة');
   } else {
-    resultEl.className = 'result-msg wrong show';
+    state.wrong++;
+    resultEl.className   = 'result-msg wrong show';
     resultEl.textContent = `❌ الإجابة: ${q.emojis[q.answer]} ${q.answer}`;
     playSound('wrong');
     speak(`الإجابة الصحيحة هي ${q.answer}`);
   }
 
-  nextBtn.className = 'next-q-btn show';
+  // بطاقة "تعلّمت اليوم"
+  if (q.fact) {
+    document.getElementById('fact-text').textContent = q.fact;
+    factCard.className = 'fact-card show';
+  }
+
+  nextBtn.className   = 'next-q-btn show';
   nextBtn.textContent = isLast ? 'عرض النتيجة 🏆' : 'التالي ←';
 }
 
@@ -469,37 +833,47 @@ function nextQuestion() {
 }
 
 function showEnd() {
-  document.getElementById('screen-game').style.display = 'none';
-  document.getElementById('screen-end').style.display = 'block';
+  showScreen('screen-end');
   const total = state.questions.length;
   const pct = state.score / (total*4);
   let trophy='🏆', stars='⭐⭐⭐', title='ممتاز! أنت بطل الألغاز!';
-  if(pct<0.4){ trophy='😊'; stars='⭐'; title='تدرّب أكثر ستتحسن!'; }
-  else if(pct<0.7){ trophy='🥈'; stars='⭐⭐'; title='جيد جداً! استمر!'; }
-  document.getElementById('end-trophy').textContent = trophy;
-  document.getElementById('end-stars').textContent  = stars;
-  document.getElementById('end-title').textContent  = title;
-  document.getElementById('end-score').textContent  = `نقاطك: ${state.score} من ${total*4}`;
-  confetti(); speak(title);
+  if      (pct<0.4) { trophy='😊'; stars='⭐';    title='تدرّب أكثر ستتحسن!'; }
+  else if (pct<0.7) { trophy='🥈'; stars='⭐⭐';  title='جيد جداً! استمر!'; }
+
+  setTimeout(() => {
+    document.getElementById('end-trophy').textContent = trophy;
+    document.getElementById('end-stars').textContent  = stars;
+    document.getElementById('end-title').textContent  = title;
+    document.getElementById('end-score').textContent  =
+      `نقاطك: ${state.score} من ${total*4}`;
+    document.getElementById('end-detail').textContent =
+      `✅ إجابات صحيحة: ${state.correct}   ❌ خاطئة: ${state.wrong}`;
+    confetti();
+    speak(title);
+  }, 300);
 }
 
 function replayGame() { startGame(state.category); }
+
 function goHome() {
-  document.getElementById('screen-categories').style.display = 'block';
-  document.getElementById('screen-game').style.display = 'none';
-  document.getElementById('screen-end').style.display = 'none';
+  try { window.speechSynthesis.cancel(); } catch(e) {}
+  showScreen('screen-categories');
 }
 
 function confetti() {
   const colors=['#0d9488','#f43f5e','#fbbf24','#8b5cf6','#10b981','#3b82f6'];
-  for(let i=0;i<28;i++) {
-    setTimeout(()=>{
-      const el=document.createElement('div');
-      el.className='confetti-piece';
-      el.style.cssText=`left:${Math.random()*100}vw;top:-10px;background:${colors[Math.floor(Math.random()*colors.length)]};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${1+Math.random()}s;`;
+  for (let i=0; i<30; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      el.style.cssText = `left:${Math.random()*100}vw;top:-10px;` +
+        `background:${colors[Math.floor(Math.random()*colors.length)]};` +
+        `width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;` +
+        `border-radius:${Math.random()>.5?'50%':'2px'};` +
+        `animation-duration:${1+Math.random()*0.8}s;`;
       document.body.appendChild(el);
-      setTimeout(()=>el.remove(),2000);
-    },i*35);
+      setTimeout(()=>el.remove(), 2500);
+    }, i*40);
   }
 }
 </script>
