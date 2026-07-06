@@ -23,7 +23,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>من أنا؟ - التعليم الممتع</title>
+<script>
+// ── Service Worker: تشغيل أوفلاين ─────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    // نكتب الـ SW مباشرة كـ Blob — لا نحتاج ملف خارجي
+    var swCode = `
+      var CACHE = 'raniim-manana-v1';
+      self.addEventListener('install', function(e) {
+        self.skipWaiting();
+      });
+      self.addEventListener('activate', function(e) {
+        self.clients.claim();
+      });
+      self.addEventListener('fetch', function(e) {
+        e.respondWith(
+          caches.match(e.request).then(function(cached) {
+            if (cached) return cached;
+            return fetch(e.request).then(function(resp) {
+              var r = resp.clone();
+              caches.open(CACHE).then(function(cache) {
+                cache.put(e.request, r);
+              });
+              return resp;
+            }).catch(function() {
+              return cached || new Response('offline');
+            });
+          })
+        );
+      });
+    `;
+    var blob = new Blob([swCode], { type: 'application/javascript' });
+    var url  = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(url)
+      .then(function(){ console.log('SW: أوفلاين مفعّل'); })
+      .catch(function(){});
+  });
+}
+</script>
 <style>
   :root {
     --teal: #0d9488; --teal-light: #ccfbf1; --teal-dark: #0f766e;
@@ -40,6 +80,8 @@
     background:linear-gradient(160deg,#0f766e 0%,#0d9488 50%,#14b8a6 100%);
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     transition: opacity 0.6s ease, transform 0.6s ease;
+    cursor:pointer; -webkit-tap-highlight-color:transparent;
+    user-select:none;
   }
   #splash.hide { opacity:0; transform:scale(1.05); pointer-events:none; }
   .splash-logo { font-size:5rem; animation:logoBounce 1s ease infinite alternate; }
@@ -57,7 +99,7 @@
     border-radius:20px; padding:6px 20px;
     color:white; font-size:0.8rem; font-weight:700; letter-spacing:0.5px;
   }
-  .splash-dots { display:flex; gap:8px; margin-top:30px; }
+  .splash-dots { display:flex; gap:8px; margin-top:24px; }
   .splash-dot {
     width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,0.4);
     animation:dotPulse 1.2s ease infinite;
@@ -67,6 +109,15 @@
   @keyframes dotPulse {
     0%,100%{ background:rgba(255,255,255,0.3); transform:scale(1); }
     50%    { background:white; transform:scale(1.3); }
+  }
+  .splash-tap {
+    margin-top:22px; color:rgba(255,255,255,0.75);
+    font-size:0.82rem; font-weight:600; letter-spacing:1px;
+    animation:tapPulse 1.5s ease infinite;
+  }
+  @keyframes tapPulse {
+    0%,100%{ opacity:0.5; transform:scale(1); }
+    50%    { opacity:1;   transform:scale(1.04); }
   }
 
   /* ====== SCREEN TRANSITIONS ====== */
@@ -265,7 +316,7 @@
 <body>
 
 <!-- ====== SPLASH ====== -->
-<div id="splash">
+<div id="splash" ontouchstart="unlockAudio()" onclick="unlockAudio()">
   <div class="splash-logo">🔍</div>
   <div class="splash-title">من أنا؟</div>
   <div class="splash-sub">خمّن الشخصية من التلميحات</div>
@@ -275,6 +326,7 @@
     <div class="splash-dot"></div>
     <div class="splash-dot"></div>
   </div>
+  <div class="splash-tap">● اضغط أي مكان للبدء ●</div>
 </div>
 
 <header>
@@ -555,9 +607,13 @@ let state = {
 };
 
 // ============================================================
-// TTS — Samsung Galaxy / Android
+// TTS — فوري / Android / WebView فيسبوك-ماسنجر / أوفلاين
+// رنيم فاي © 2026
 // ============================================================
-var synth = window.speechSynthesis || null;
+var synth         = window.speechSynthesis || null;
+var audioUnlocked = false;
+var pendingAudio  = null;
+var isSpeaking    = false;
 
 function getArVoice() {
   try {
@@ -570,62 +626,110 @@ function getArVoice() {
   } catch(e){ return null; }
 }
 
-// تفعيل السياق الصوتي عند أول لمسة
-var ttsUnlocked = false;
-document.addEventListener('touchstart', function unlock() {
-  if (ttsUnlocked || !synth) return;
+function unlockAudio() {
+  if (audioUnlocked) return;
+  audioUnlocked = true;
+
+  // 1. تفعيل AudioContext
   try {
-    var u = new SpeechSynthesisUtterance(' ');
-    u.volume = 0; u.lang = 'ar-SA';
-    synth.speak(u);
-    ttsUnlocked = true;
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (AC) {
+      var ctx = new AC();
+      if (ctx.state === 'suspended') ctx.resume();
+      var buf = ctx.createBuffer(1, 1, 22050);
+      var src = ctx.createBufferSource();
+      src.buffer = buf;
+      src.connect(ctx.destination);
+      src.start(0);
+      window._audioCtx = ctx;
+    }
   } catch(e) {}
-  document.removeEventListener('touchstart', unlock);
-}, { once: true });
 
-var speakQueue = [];
-var isSpeaking = false;
+  // 2. نبضة صامتة — ننتظر انتهاءها ثم نُشغّل النص المعلّق
+  try {
+    if (synth) {
+      synth.cancel();
+      var silent = new SpeechSynthesisUtterance('\u200b');
+      silent.volume = 0;
+      silent.lang   = 'ar-SA';
+      silent.onend = function() {
+        if (pendingAudio) {
+          var t = pendingAudio;
+          pendingAudio = null;
+          speak(t);
+        }
+      };
+      // احتياطي: إذا لم ينتهِ onend خلال 600ms نُشغّل مباشرة
+      setTimeout(function() {
+        if (pendingAudio) {
+          var t = pendingAudio;
+          pendingAudio = null;
+          speak(t);
+        }
+      }, 600);
+      synth.speak(silent);
+    }
+  } catch(e) {
+    // إذا فشل كل شيء — نُشغّل مباشرة
+    if (pendingAudio) {
+      var t2 = pendingAudio;
+      pendingAudio = null;
+      setTimeout(function(){ speak(t2); }, 300);
+    }
+  }
 
-function speak(text) {
-  if (!synth || !text) return;
-  speakQueue = []; // امسح القديم
-  speakQueue.push(text);
-  if (!isSpeaking) processQueue();
+  // 3. إزالة المستمعَين
+  document.body.removeEventListener('touchstart', unlockAudio, true);
+  document.body.removeEventListener('click',      unlockAudio, true);
+  document.body.removeEventListener('pointerdown',unlockAudio, true);
 }
 
-function processQueue() {
-  if (!speakQueue.length) { isSpeaking = false; return; }
-  isSpeaking = true;
-  var text = speakQueue.shift();
+// مستمعون احتياطيون إذا تجاوز المستخدم الـ Splash
+document.body.addEventListener('touchstart', unlockAudio, { capture:true, once:true });
+document.body.addEventListener('click',      unlockAudio, { capture:true, once:true });
+document.body.addEventListener('pointerdown', unlockAudio, { capture:true, once:true });
+
+function speak(text) {
+  if (!text) return;
+
+  // الصوت لم يُفعَّل بعد — احفظ وانتظر
+  if (!audioUnlocked) { pendingAudio = text; return; }
+  if (!synth) return;
 
   try { synth.cancel(); } catch(e) {}
+  isSpeaking = true;
 
-  setTimeout(function() {
-    try {
-      var u = new SpeechSynthesisUtterance(text);
-      var v = getArVoice();
-      if (v) { u.voice = v; }
-      u.lang   = 'ar-SA';
-      u.rate   = 0.80;
-      u.pitch  = 1.0;
-      u.volume = 1.0;
+  try {
+    if (synth.paused) { try { synth.resume(); } catch(e){} }
+    var u = new SpeechSynthesisUtterance(text);
+    var v = getArVoice();
+    if (v) u.voice = v;
+    u.lang   = 'ar-SA';
+    u.rate   = 0.80;
+    u.pitch  = 1.0;
+    u.volume = 1.0;
 
-      u.onend   = function() { isSpeaking = false; };
-      u.onerror = function() { isSpeaking = false; };
+    u.onend   = function() { isSpeaking = false; };
+    u.onerror = function(e) {
+      isSpeaking = false;
+      if (e.error !== 'interrupted' && e.error !== 'canceled') {
+        setTimeout(function(){ speak(text); }, 500);
+      }
+    };
 
-      // Android watchdog: إذا لم يبدأ خلال 3 ثواني أعد المحاولة
-      var started = false;
-      u.onstart = function() { started = true; };
-      setTimeout(function() {
-        if (!started) {
-          isSpeaking = false;
-          try { synth.cancel(); synth.speak(u); } catch(e2) {}
-        }
-      }, 3000);
+    // Watchdog لـ WebView فيسبوك
+    var started = false;
+    u.onstart = function() { started = true; };
+    setTimeout(function() {
+      if (!started && isSpeaking) {
+        isSpeaking = false;
+        try { synth.cancel(); } catch(e){}
+        setTimeout(function(){ speak(text); }, 300);
+      }
+    }, 2000);
 
-      synth.speak(u);
-    } catch(e) { isSpeaking = false; }
-  }, 200);
+    synth.speak(u);
+  } catch(e) { isSpeaking = false; }
 }
 
 function playSound(type) {
@@ -671,19 +775,40 @@ function showScreen(id) {
 // ============================================================
 // SPLASH
 // ============================================================
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    document.getElementById('splash').classList.add('hide');
-    setTimeout(() => {
-      document.getElementById('splash').style.display = 'none';
-      const cat = document.getElementById('screen-categories');
-      cat.classList.add('visible');
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => { cat.classList.add('active'); });
+// ============================================================
+// SPLASH — تختفي بلمسة المستخدم فقط
+// ============================================================
+var splashDone = false;
+
+function hideSplash() {
+  if (splashDone) return;
+  splashDone = true;
+
+  // ضع النص أولاً كمعلّق — سيُنطق فور اكتمال التفعيل
+  pendingAudio = 'اختر فئة للعب';
+
+  // فعّل الصوت (سيُشغّل pendingAudio تلقائياً عند الجاهزية)
+  unlockAudio();
+
+  // إخفاء Splash
+  var splash = document.getElementById('splash');
+  splash.classList.add('hide');
+
+  setTimeout(function() {
+    splash.style.display = 'none';
+    var cat = document.getElementById('screen-categories');
+    cat.classList.add('visible');
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        cat.classList.add('active');
       });
-    }, 650);
-  }, 2200);
-});
+    });
+  }, 600);
+}
+
+// Splash تنتظر لمسة المستخدم
+document.getElementById('splash').addEventListener('touchstart', hideSplash, { once:true });
+document.getElementById('splash').addEventListener('click',      hideSplash, { once:true });
 
 // ============================================================
 // GAME LOGIC
@@ -700,7 +825,8 @@ function startGame(cat) {
 
   showScreen('screen-game');
   document.getElementById('q-total').textContent = state.questions.length;
-  setTimeout(renderQuestion, 300);
+  // انتظر ظهور الشاشة كاملاً ثم ابدأ
+  setTimeout(renderQuestion, 450);
 }
 
 function renderQuestion() {
@@ -757,13 +883,19 @@ function renderQuestion() {
 }
 
 function showClue() {
-  const q = state.questions[state.currentIndex];
-  const clue = q.clues[state.currentClue];
-  const div = document.createElement('div');
+  var q    = state.questions[state.currentIndex];
+  var clue = q.clues[state.currentClue];
+  var div  = document.createElement('div');
   div.className = 'clue-bubble';
-  div.innerHTML = `<span class="clue-number">${state.currentClue+1}</span>${clue}`;
+  div.innerHTML = '<span class="clue-number">' + (state.currentClue+1) + '</span>' + clue;
   document.getElementById('clues-container').appendChild(div);
-  speak(clue);
+
+  // أول تلميح: اقرأ مقدمة اللغز ثم التلميح
+  if (state.currentClue === 0) {
+    speak('من أنا؟ ' + clue);
+  } else {
+    speak(clue);
+  }
 }
 
 function showNextClue() {
@@ -856,10 +988,10 @@ function showEnd() {
 function replayGame() { startGame(state.category); }
 
 function goHome() {
-  try { window.speechSynthesis.cancel(); } catch(e) {}
+  try { if(synth) synth.cancel(); } catch(e) {}
   showScreen('screen-categories');
+  setTimeout(function(){ speak('اختر فئة للعب'); }, 500);
 }
-
 function confetti() {
   const colors=['#0d9488','#f43f5e','#fbbf24','#8b5cf6','#10b981','#3b82f6'];
   for (let i=0; i<30; i++) {
